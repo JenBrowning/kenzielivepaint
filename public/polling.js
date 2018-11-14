@@ -1,31 +1,28 @@
-// Add logic to this script to poll server every second for updated pixels.
-// Add logic to this script to poll server every second for updated pixels.
 const timeoutLength = 1000;
 let lengthOfLastServerUpdate = 0;
-const pollServer = async function () {
-    let body = {
-        "clientUpdates": clientUpdates,
-        "lengthOfLastServerUpdate": lengthOfLastServerUpdate    }
-}
+let clientUpdates = [];
 
-body.JSON.stringify(body)
-clientUpdates = [];
-let res = await fetch('/updates', {
+const pollServer = async function() {
+  let body = JSON.stringify({
+    clientUpdates: clientUpdates,
+    lengthOfLastServerUpdate: lengthOfLastServerUpdate
+  });
+
+  clientUpdates = [];
+
+  let res = await fetch("/updates", {
     method: "POST",
     headers: {
-        "Content-Type": "application/json; charset=utf-8"
-
+      "Content-Type": "application/json; charset=utf-8"
     },
     body: body
-})
-res = await res.json();
-lengthOfLastServerUpdate =+ res.serverUpdates.length
+  });
+  res = await res.json();
+  res.serverUpdates.forEach(update => {
+    bitmap.applyUpdatesFromServer(update[0], update[1], update[2]);
+  });
+  lengthOfLastServerUpdate = res.lengthOfLastServerUpdate;
 
-
-//could also use fetch/then like Aaron's example
-.then(response. => response.json())
-.then(serverUpdates => {
-    console.log(serverUpdates);
-    userIndex = serverUpdates.serverIndex;
-    serverUpdates.updates
-})
+  setTimeout(pollServer, timeoutLength);
+};
+setTimeout(pollServer, timeoutLength);
